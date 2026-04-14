@@ -1,0 +1,30 @@
+{
+  "devDependencies": {
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.1"
+  },
+  "name": "intelligent-full-stack-web-security-analyzer-using-ai",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">\r   <img src=\"https://img.shields.io/badge/Python-3.10+-blue.svg\" alt=\"Python\">\r   <img src=\"https://img.shields.io/badge/React-18-blue.svg\" alt=\"React\">\r   <img src=\"https://img.shields.io/badge/FastAPI-0.104+-green.svg\" alt=\"FastAPI\">\r   <img src=\"https://img.shields.io/badge/License-MIT-yellow.svg\" alt=\"License\">\r </p>",
+  "main": "index.js",
+  "dependencies": {
+    "baseline-browser-mapping": "^2.10.0",
+    "browserslist": "^4.28.1",
+    "caniuse-lite": "^1.0.30001776",
+    "electron-to-chromium": "^1.5.307",
+    "escalade": "^3.2.0",
+    "fraction.js": "^5.3.4",
+    "nanoid": "^3.3.11",
+    "node-releases": "^2.0.36",
+    "picocolors": "^1.1.1",
+    "postcss-value-parser": "^4.2.0",
+    "source-map-js": "^1.2.1",
+    "update-browserslist-db": "^1.2.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
