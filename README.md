@@ -61,7 +61,7 @@ An AI-powered full-stack web vulnerability scanner that combines traditional sec
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-repo/security-analyzer.git
+git clone https://github.com/jeevangudavalli7/Intelligent-Full-Stack-Web-Security-Analyzer-Using-AI
 cd security-analyzer
 
 # Copy environment file
