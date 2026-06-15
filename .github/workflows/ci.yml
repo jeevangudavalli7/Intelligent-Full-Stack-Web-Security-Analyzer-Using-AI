@@ -27,7 +27,7 @@ jobs:
         run: |
           cd frontend
           npm ci
-      - name: Lint frontend
+      - name: Build frontend
         run: |
           cd frontend
-          npm run lint  # if you have a lint script
+          npm run build
