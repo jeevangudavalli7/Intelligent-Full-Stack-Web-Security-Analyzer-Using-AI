@@ -1,33 +1,39 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+// frontend/src/api/scans.js  — REPLACE your existing file entirely with this
+// (Your current file is a copy of auth.js — this is the correct version)
 
-export const createScan = async (targetUrl, mode, intensity, modules) => {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${API_BASE}/scans`, {
+const BASE = '/api/v1';
+
+export const createScan = async (targetUrl, mode, intensity, modules, token) => {
+  const res = await fetch(`${BASE}/scans/`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: JSON.stringify({ target_url: targetUrl, mode, intensity, modules }),
   });
-  if (!res.ok) throw new Error('Failed to start scan');
+  if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Failed to create scan'); }
   return res.json();
 };
 
-export const getScan = async (scanId) => {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${API_BASE}/scans/${scanId}`, {
-    headers: { 'Authorization': `Bearer ${token}` },
+export const getScanStatus = async (scanId, token) => {
+  const res = await fetch(`${BASE}/scans/${scanId}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!res.ok) throw new Error('Failed to fetch scan');
+  if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Failed to get scan'); }
   return res.json();
 };
 
-export const getReport = async (scanId) => {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${API_BASE}/scans/${scanId}/report`, {
-    headers: { 'Authorization': `Bearer ${token}` },
+export const listScans = async (token) => {
+  const res = await fetch(`${BASE}/scans/`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!res.ok) throw new Error('Failed to fetch report');
+  if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Failed to list scans'); }
+  return res.json();
+};
+
+export const deleteScan = async (scanId, token) => {
+  const res = await fetch(`${BASE}/scans/${scanId}`, {
+    method: 'DELETE',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Failed to delete scan'); }
   return res.json();
 };

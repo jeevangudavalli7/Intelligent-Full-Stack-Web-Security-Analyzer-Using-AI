@@ -224,3 +224,75 @@ MIT License - see LICENSE file for details.
 - Inspired by OWASP testing guide
 - ML model trained on publicly available vulnerability datasets
 
+# 🔧 Backend ↔ Frontend Integration Fix
+
+## What was broken and what was fixed
+
+### 1. `frontend/src/tabs/DemoTab.jsx`
+| Before | After |
+|--------|-------|
+| `API = "https://security-analyzer-api.onrender.com"` | `API = ""` (same-origin via Vite proxy) |
+| Called `/scan/start` on a dead Render URL | Calls `/scan/start` → proxied to `localhost:8000` |
+
+### 2. `frontend/vite.config.js`
+**Added `server.proxy`** — proxies all `/scan/*`, `/report/*`, `/api/*`, `/health` requests
+to `http://localhost:8000` during development. This removes all CORS errors.
+
+```js
+proxy: {
+  '/scan':   { target: 'http://localhost:8000', changeOrigin: true },
+  '/report': { target: 'http://localhost:8000', changeOrigin: true },
+  '/api':    { target: 'http://localhost:8000', changeOrigin: true },
+}
+```
+
+### 3. `backend/main.py`
+- **CORS fixed**: added `http://localhost:5173` (Vite's actual port) — previously only `3000` was allowed.
+- **Added `/scan/start` (POST)** — the endpoint DemoTab actually calls.
+- **Added `/scan/status/{job_id}` (GET)** — polling endpoint DemoTab uses.
+- **Added `/report/pdf/{job_id}` (GET)** — for the PDF download button.
+- The scan runs in a **background asyncio task** using your real scanner modules
+  (`scanner.xss_scanner`, `scanner.csrf_scanner`, `scanner.sqli_scanner`).
+  If a module fails to import, it **gracefully falls back to mock findings** so the UI always works.
+
+### 4. `backend/api/routes/scans.py`
+- Added missing `GET /api/v1/scans/` list endpoint.
+- Fixed progress simulation so status eventually reaches `COMPLETE`.
+
+### 5. `frontend/src/api/scans.js`
+- This file was a copy of `auth.js` (completely wrong).
+- Replaced with correct `createScan`, `getScanStatus`, `getScanReport`, `listScans`, `deleteScan` helpers.
+
+---
+
+## How to run
+
+```bash
+# Terminal 1 — Backend
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+
+# Terminal 2 — Frontend
+cd frontend
+npm install
+npm run dev          # starts on http://localhost:5173
+```
+
+Open **http://localhost:5173** → click **Live Demo** tab → enter a URL → click **RUN SCAN**.
+
+The frontend calls `/scan/start` → Vite proxy forwards it to `http://localhost:8000/scan/start`
+→ FastAPI returns `{ job_id }` → frontend polls `/scan/status/{job_id}` every 3 s
+→ when status is `"completed"`, findings are rendered.
+
+---
+
+## Files to copy into your project
+
+| File in this zip | Destination in your repo |
+|-----------------|--------------------------|
+| `backend/main.py` | `backend/main.py` (replace entirely) |
+| `backend/api/routes/scans.py` | `backend/api/routes/scans.py` (replace entirely) |
+| `frontend/vite.config.js` | `frontend/vite.config.js` (replace entirely) |
+| `frontend/src/tabs/DemoTab.jsx` | `frontend/src/tabs/DemoTab.jsx` (replace entirely) |
+| `frontend/src/api/scans.js` | `frontend/src/api/scans.js` (replace entirely) |

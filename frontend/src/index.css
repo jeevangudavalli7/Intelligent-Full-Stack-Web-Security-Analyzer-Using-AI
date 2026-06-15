@@ -1,15 +1,90 @@
+/* frontend/src/index.css  — REPLACE your existing file entirely with this */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── DARK THEME (default) ─────────────────────────────────────────────── */
+:root, [data-theme="dark"] {
+  --bg:           #080c14;
+  --surface:      #0d1221;
+  --card:         #111827;
+  --border:       #1e2d4a;
+  --border-light: #243655;
+  --accent:       #22d3ee;
+  --accent-glow:  rgba(34,211,238,0.15);
+  --danger:       #f43f5e;
+  --danger-dim:   rgba(244,63,94,0.12);
+  --warn:         #f59e0b;
+  --warn-dim:     rgba(245,158,11,0.12);
+  --success:      #10b981;
+  --success-dim:  rgba(16,185,129,0.12);
+  --info:         #818cf8;
+  --info-dim:     rgba(129,140,248,0.12);
+  --text:         #e2e8f0;
+  --text-dim:     #94a3b8;
+  --text-muted:   #475569;
+  --input-bg:     #0d1221;
+  --mono:         'Space Mono', monospace;
+  --sans:         'DM Sans', sans-serif;
+  color-scheme: dark;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* ── LIGHT THEME ──────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg:           #f0f4f8;
+  --surface:      #ffffff;
+  --card:         #ffffff;
+  --border:       #e2e8f0;
+  --border-light: #cbd5e1;
+  --accent:       #0891b2;
+  --accent-glow:  rgba(8,145,178,0.12);
+  --danger:       #e11d48;
+  --danger-dim:   rgba(225,29,72,0.08);
+  --warn:         #d97706;
+  --warn-dim:     rgba(217,119,6,0.08);
+  --success:      #059669;
+  --success-dim:  rgba(5,150,105,0.08);
+  --info:         #6366f1;
+  --info-dim:     rgba(99,102,241,0.08);
+  --text:         #1e293b;
+  --text-dim:     #475569;
+  --text-muted:   #94a3b8;
+  --input-bg:     #f8fafc;
+  color-scheme: light;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.25s, color 0.25s;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.fade-up { animation: fadeUp 0.4s cubic-bezier(.25,.8,.25,1) both; }
+.fade-in { animation: fadeIn 0.3s ease both; }
+
+/* Grid texture overlay (dark only) */
+[data-theme="dark"] body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.018) 1px, transparent 1px);
+  background-size: 40px 40px;
 }

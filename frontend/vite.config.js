@@ -1,16 +1,16 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+// frontend/vite.config.js  — REPLACE your existing file entirely with this
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
+    port: 5173,
     proxy: {
-      '/api': 'http://localhost:8000',
-      '/ws': {
-        target: 'ws://localhost:8001',
-        ws: true,
-      },
+      '/scan':   { target: 'http://localhost:8000', changeOrigin: true },
+      '/report': { target: 'http://localhost:8000', changeOrigin: true },
+      '/api':    { target: 'http://localhost:8000', changeOrigin: true },
+      '/health': { target: 'http://localhost:8000', changeOrigin: true },
     },
   },
-});
+})

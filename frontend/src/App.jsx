@@ -1,74 +1,115 @@
+// frontend/src/App.jsx  — REPLACE your existing file entirely with this
 import React, { useState } from 'react';
-import { COLORS } from './constants/colors';
-import { Badge } from './components/Badge';
-// Import all tabs
-import { ArchitectureTab } from './tabs/ArchitectureTab';
-import { ScannerTab } from './tabs/ScannerTab';
-import { MLTab } from './tabs/MLTab';
-import { APITab } from './tabs/APITab';
-import { SchemaTab } from './tabs/SchemaTab';
-import { DeployTab } from './tabs/DeployTab';
-import { DemoTab } from './tabs/DemoTab';
+import { useAuth } from './context/AuthContext';
+import { useTheme } from './context/ThemeContext';
 
-const TAB_DEMO = "demo";
-const TAB_ARCHITECTURE = "architecture";
-const TAB_SCANNER = "scanner";
-const TAB_ML = "ml";
-const TAB_API = "api";
-const TAB_SCHEMA = "schema";
-const TAB_DEPLOY = "deploy";
+// Pages
+import LoginPage from './pages/LoginPage';
+
+// Tab components (unchanged except DemoTab)
+import { DemoTab }         from './tabs/DemoTab';
+import { ArchitectureTab } from './tabs/ArchitectureTab';
+import { ScannerTab }      from './tabs/ScannerTab';
+import { MLTab }           from './tabs/MLTab';
+import { APITab }          from './tabs/APITab';
+import { SchemaTab }       from './tabs/SchemaTab';
+import { DeployTab }       from './tabs/DeployTab';
+
+const TABS = [
+  { id: 'demo',         label: 'Live Demo',       icon: '▶' },
+  { id: 'architecture', label: 'Architecture',    icon: '🏗' },
+  { id: 'scanner',      label: 'Scanner Modules', icon: '🔍' },
+  { id: 'ml',           label: 'ML Pipeline',     icon: '🧠' },
+  { id: 'api',          label: 'API Endpoints',   icon: '⚡' },
+  { id: 'schema',       label: 'DB Schema',       icon: '🗄' },
+  { id: 'deploy',       label: 'Deployment',      icon: '🚀' },
+];
 
 function App() {
-  const [activeTab, setActiveTab] = useState(TAB_DEMO);
+  const { user, logout } = useAuth();
+  const { theme, toggle } = useTheme();
+  const [activeTab, setActiveTab] = useState('demo');
 
-  const TABS = [
-    { id: TAB_DEMO, label: "Live Demo", icon: "▶" },
-    { id: TAB_ARCHITECTURE, label: "Architecture", icon: "🏗" },
-    { id: TAB_SCANNER, label: "Scanner Modules", icon: "🔍" },
-    { id: TAB_ML, label: "ML Pipeline", icon: "🧠" },
-    { id: TAB_API, label: "API Endpoints", icon: "⚡" },
-    { id: TAB_SCHEMA, label: "DB Schema", icon: "🗄" },
-    { id: TAB_DEPLOY, label: "Deployment", icon: "🚀" },
-  ];
+  // ── Not logged in → show login page ───────────────────────────────────────
+  if (!user) return <LoginPage />;
 
+  // ── Logged in → show main app ──────────────────────────────────────────────
   return (
-    <div style={{ background: COLORS.bg, minHeight: "100vh", fontFamily: "'Segoe UI', system-ui, sans-serif", color: COLORS.text }}>
-      <div style={{ background: COLORS.surface, borderBottom: `1px solid ${COLORS.border}`, padding: "0 32px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 0 16px" }}>
-            <div style={{ width: 36, height: 36, background: `linear-gradient(135deg, ${COLORS.accent}, ${COLORS.info})`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🛡</div>
-            <div>
-              <div style={{ color: COLORS.text, fontWeight: 800, fontSize: 18, letterSpacing: -0.5 }}>Intelligent Web Security Analyzer</div>
-              <div style={{ color: COLORS.muted, fontSize: 12 }}>Full-Stack · AI/ML Powered · NLP Reports</div>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', position: 'relative' }}>
+
+      {/* ── NAVBAR ── */}
+      <header style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px' }}>
+
+          {/* Top bar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, height: 58 }}>
+            {/* Brand */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, var(--accent), var(--info))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, boxShadow: '0 0 16px var(--accent-glow)' }}>🛡</div>
+              <div>
+                <div style={{ fontFamily: 'var(--mono)', fontWeight: 700, fontSize: 13, color: 'var(--text)' }}>SecurityAI</div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: 2 }}>ANALYZER v2</div>
+              </div>
             </div>
-            <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-              <Badge label="XSS" color={COLORS.danger} />
-              <Badge label="SQLi" color={COLORS.warn} />
-              <Badge label="CSRF" color={COLORS.info} />
-              <Badge label="ML" color={COLORS.success} />
-              <Badge label="NLP" color="#f06292" />
+
+            <div style={{ flex: 1 }} />
+
+            {/* Tech badges */}
+            <div style={{ display: 'flex', gap: 6 }}>
+              {['XSS','SQLi','CSRF','ML','NLP'].map(b => (
+                <span key={b} style={{ background: 'var(--accent-glow)', color: 'var(--accent)', border: '1px solid rgba(34,211,238,0.25)', borderRadius: 4, padding: '2px 8px', fontSize: 10, fontFamily: 'var(--mono)', fontWeight: 700, letterSpacing: 1 }}>{b}</span>
+              ))}
+            </div>
+
+            {/* Dark / Light toggle */}
+            <button onClick={toggle}
+              style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 13px', cursor: 'pointer', color: 'var(--text-dim)', fontSize: 12, fontFamily: 'var(--mono)', display: 'flex', alignItems: 'center', gap: 6, transition: 'border 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
+              {theme === 'dark' ? '☀ Light' : '◑ Dark'}
+            </button>
+
+            {/* User avatar + logout */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'var(--accent-glow)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'var(--accent)', fontWeight: 700, fontFamily: 'var(--mono)' }}>
+                {(user.email || 'U')[0].toUpperCase()}
+              </div>
+              <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--mono)', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {user.email}
+              </span>
+              <button onClick={logout}
+                style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 7, padding: '6px 12px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--mono)', transition: 'all 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--danger)'; e.currentTarget.style.color = 'var(--danger)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}>
+                Sign Out
+              </button>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 2 }}>
+
+          {/* Tab bar */}
+          <div style={{ display: 'flex', gap: 2 }}>
             {TABS.map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                style={{ background: activeTab === tab.id ? COLORS.card : "transparent", border: "none", borderBottom: activeTab === tab.id ? `2px solid ${COLORS.accent}` : "2px solid transparent", color: activeTab === tab.id ? COLORS.text : COLORS.muted, padding: "10px 16px", fontSize: 13, cursor: "pointer", borderRadius: "6px 6px 0 0", fontWeight: activeTab === tab.id ? 700 : 400, transition: "all 0.15s" }}>
-                <span style={{ marginRight: 6 }}>{tab.icon}</span>{tab.label}
+                style={{ background: 'transparent', border: 'none', borderBottom: activeTab === tab.id ? '2px solid var(--accent)' : '2px solid transparent', color: activeTab === tab.id ? 'var(--accent)' : 'var(--text-muted)', padding: '10px 15px', fontSize: 13, cursor: 'pointer', borderRadius: '6px 6px 0 0', fontWeight: activeTab === tab.id ? 600 : 400, fontFamily: 'var(--sans)', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
+                onMouseEnter={e => { if (activeTab !== tab.id) e.currentTarget.style.color = 'var(--text)'; }}
+                onMouseLeave={e => { if (activeTab !== tab.id) e.currentTarget.style.color = 'var(--text-muted)'; }}>
+                <span>{tab.icon}</span>{tab.label}
               </button>
             ))}
           </div>
         </div>
-      </div>
+      </header>
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px" }}>
-        {activeTab === TAB_DEMO && <DemoTab />}
-        {activeTab === TAB_ARCHITECTURE && <ArchitectureTab />}
-        {activeTab === TAB_SCANNER && <ScannerTab />}
-        {activeTab === TAB_ML && <MLTab />}
-        {activeTab === TAB_API && <APITab />}
-        {activeTab === TAB_SCHEMA && <SchemaTab />}
-        {activeTab === TAB_DEPLOY && <DeployTab />}
-      </div>
+      {/* ── PAGE CONTENT ── */}
+      <main style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 28px', position: 'relative', zIndex: 1 }}>
+        {activeTab === 'demo'         && <DemoTab />}
+        {activeTab === 'architecture' && <ArchitectureTab />}
+        {activeTab === 'scanner'      && <ScannerTab />}
+        {activeTab === 'ml'           && <MLTab />}
+        {activeTab === 'api'          && <APITab />}
+        {activeTab === 'schema'       && <SchemaTab />}
+        {activeTab === 'deploy'       && <DeployTab />}
+      </main>
     </div>
   );
 }
